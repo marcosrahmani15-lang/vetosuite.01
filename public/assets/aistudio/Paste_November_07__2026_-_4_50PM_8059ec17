@@ -1,0 +1,984 @@
+# MASTER PROMPT — MYVET VETERINARY MANAGEMENT SYSTEM
+## Full-Stack Development, Automated SMS Reminders & Dashboard Integration
+
+You are acting as a **Senior Full-Stack Software Engineer, Software Architect, Database Engineer, and UI/UX Designer**.
+
+Your task is to inspect, understand, improve, and extend an existing veterinary clinic management application called **MyVet**.
+
+You must work directly with the existing project codebase.
+
+This is NOT a request to create a new application from scratch.
+
+Your primary objective is to integrate a professional, reliable, scalable SMS reminder management system into the existing MyVet administration dashboard while preserving its current architecture, visual identity, and existing functionality.
+
+---
+
+# 1. PROJECT OVERVIEW
+
+**Project name:** MyVet
+
+**Business type:** Veterinary Clinic Management System
+
+**Country:** Algeria
+
+**Primary language:** French
+
+**Future language support:** Arabic
+
+**Main objective:**
+
+Build a complete veterinary clinic management solution that allows clinic staff to manage:
+
+- Animal medical records.
+- Pet owners and clients.
+- Vaccinations and vaccination schedules.
+- Veterinary appointments.
+- Medical follow-ups.
+- Automated SMS reminders.
+- SMS history and delivery monitoring.
+- SMS templates and configuration.
+- Team tasks and administrative activities.
+
+The automated SMS functionality is one of the most important requirements.
+
+The clinic specifically wants traditional SMS messages, NOT WhatsApp messages.
+
+The system must eventually send real SMS messages to Algerian mobile numbers, including Ooredoo, Djezzy, and Mobilis.
+
+However, real SMS delivery must only be activated after integrating a verified and authorized SMS provider.
+
+---
+
+# 2. CRITICAL RULE — INSPECT BEFORE MODIFYING
+
+Before writing or modifying any code, perform a complete inspection of the existing project.
+
+Identify:
+
+1. Frontend framework and version.
+2. Backend architecture.
+3. Programming language.
+4. Database technology.
+5. Existing database schema.
+6. Authentication implementation.
+7. Existing user roles and permissions.
+8. Existing dashboard components.
+9. Existing navigation and routing.
+10. Existing API endpoints.
+11. Existing deployment configuration.
+12. Existing background jobs or scheduling mechanisms.
+13. Existing environment variables and secrets management.
+
+Inspect the actual project files, not just the visible interface.
+
+Do not assume that the project uses React, Next.js, Express, Supabase, PostgreSQL, Firebase, or any other technology.
+
+Determine the actual stack from the codebase.
+
+### Mandatory rules
+
+- Do not rebuild the application unnecessarily.
+- Do not replace the existing framework.
+- Do not introduce a second database if one already exists.
+- Do not replace the authentication system.
+- Do not remove existing features.
+- Do not change unrelated dashboard sections.
+- Reuse existing components, styles, utilities, and conventions.
+- Preserve existing data and database compatibility.
+- Avoid unnecessary dependencies.
+
+If the existing architecture has limitations, explain them before proposing changes.
+
+---
+
+# 3. EXISTING DASHBOARD DESIGN
+
+Use the supplied MyVet dashboard screenshot as the visual reference.
+
+The application already has a veterinary management dashboard.
+
+Preserve its visual identity:
+
+- Primary color: natural veterinary green.
+- Secondary colors: white and soft cream.
+- Friendly and professional appearance.
+- Rounded cards and buttons.
+- Subtle borders and shadows.
+- Small paw-print details.
+- Friendly animal illustrations.
+- Clean French typography.
+- Clear navigation hierarchy.
+- Responsive desktop, tablet, and mobile layouts.
+
+The existing dashboard uses a left-side navigation menu.
+
+The new features must feel like natural extensions of the existing application.
+
+Do not redesign the entire dashboard.
+
+Do not replace the current logo, sidebar, navigation structure, typography, or color palette without a specific technical reason.
+
+You may improve individual components when necessary to support the new functionality.
+
+The final result must look like one coherent veterinary management platform.
+
+---
+
+# 4. REQUIRED SYSTEM ARCHITECTURE
+
+Organize the implementation into logical modules.
+
+## A. Pet Owners / Clients
+
+Create or extend an owner management module.
+
+Each owner should contain:
+
+- Unique ID.
+- Full name.
+- Mobile phone number.
+- Optional email address.
+- Optional address.
+- Preferred communication language.
+- SMS consent status.
+- Created date.
+- Additional notes.
+
+One owner can own multiple animals.
+
+The relationship must be implemented correctly in the database.
+
+## B. Animals
+
+Each animal must contain:
+
+- Unique ID.
+- Animal name.
+- Species: Dog, Cat, Other.
+- Breed.
+- Date of birth or estimated age.
+- Gender.
+- Owner ID.
+- Medical notes.
+- Registration date.
+
+An animal must be associated with an owner.
+
+The system must allow staff to view all animals belonging to one owner.
+
+## C. Vaccinations
+
+Create a complete vaccination management module.
+
+Each vaccination record should contain:
+
+- Vaccination ID.
+- Animal ID.
+- Owner ID, derived consistently through the animal relationship.
+- Vaccination name.
+- Vaccination date.
+- Next vaccination due date.
+- Medical notes.
+- Created by.
+- Created date.
+
+Required functionality:
+
+- Register a vaccination.
+- Edit vaccination information.
+- View vaccination history.
+- View upcoming vaccinations.
+- Identify overdue vaccinations.
+- Search and filter records.
+- View the vaccination history of each animal.
+
+The next vaccination due date must be the source of truth for reminder scheduling.
+
+---
+
+# 5. AUTOMATED SMS REMINDER ENGINE
+
+This is the highest-priority technical feature.
+
+Build a backend-based reminder engine.
+
+Do not implement automatic SMS sending using frontend timers or browser-based JavaScript.
+
+The system must continue working when:
+
+- The dashboard is closed.
+- The clinic computer is turned off.
+- No staff member is logged in.
+- The website is not actively being used.
+
+Use a suitable backend scheduling mechanism compatible with the existing architecture.
+
+Possible implementations include:
+
+- Cron jobs.
+- Background workers.
+- Queue systems.
+- Scheduled database jobs.
+- Managed cloud scheduling services.
+
+Choose the simplest reliable architecture compatible with the current deployment environment.
+
+## Vaccination reminder workflow
+
+1. A veterinarian registers a vaccination.
+2. The veterinarian enters the next vaccination due date.
+3. The system calculates the reminder dates.
+4. The system creates scheduled reminder records.
+5. A backend worker checks due reminders.
+6. The system validates the owner, animal, consent, and vaccination status.
+7. The SMS provider sends the message.
+8. The system records the provider response.
+9. Delivery reports update the SMS status when supported.
+
+## Configurable reminder intervals
+
+Allow administrators to configure reminder intervals.
+
+Default suggestions:
+
+- 7 days before vaccination.
+- 3 days before vaccination.
+- 1 day before vaccination.
+
+These must be configurable rather than hardcoded.
+
+Administrators should be able to:
+
+- Enable or disable each interval.
+- Add additional intervals.
+- Change the reminder schedule.
+- Enable or disable vaccination reminders globally.
+
+When vaccination dates change, previous reminders must be cancelled and recalculated.
+
+Prevent outdated reminders from being sent.
+
+---
+
+# 6. APPOINTMENT MANAGEMENT AND SMS
+
+Create or extend the appointment management module.
+
+Each appointment should include:
+
+- Appointment ID.
+- Animal ID.
+- Owner ID.
+- Appointment date.
+- Appointment time.
+- Appointment purpose.
+- Assigned veterinarian.
+- Appointment status.
+- Internal notes.
+
+Supported statuses:
+
+- Scheduled.
+- Confirmed.
+- Completed.
+- Cancelled.
+- Missed.
+
+## Appointment SMS workflow
+
+Automatically schedule appointment reminder messages.
+
+Suggested default:
+
+- 24 hours before the appointment.
+
+Allow administrators to configure this interval.
+
+Important rules:
+
+1. Cancelled appointments must never trigger reminders.
+2. Rescheduled appointments must have their old reminders cancelled.
+3. New reminders must be generated using the updated appointment time.
+4. Completed appointments must not receive future appointment reminders.
+5. Prevent duplicate reminders.
+6. Respect the owner's SMS consent status.
+
+---
+
+# 7. SMS PROVIDER INTEGRATION ARCHITECTURE
+
+Design a provider-independent SMS integration layer.
+
+Do not tightly couple the reminder engine to one SMS provider.
+
+Create a clean provider interface.
+
+Conceptual example:
+
+SMSProvider
+- sendSMS()
+- getMessageStatus()
+- validatePhoneNumber()
+- handleDeliveryWebhook()
+
+Implement the provider adapter separately from the reminder business logic.
+
+The architecture should allow the clinic to change SMS providers later without rewriting the vaccination or appointment modules.
+
+## IMPORTANT: REAL SMS VS TEST MODE
+
+There are two distinct operating modes.
+
+### Mode 1 — Test Mode
+
+Available immediately.
+
+Features:
+
+- Generate SMS messages.
+- Preview message content.
+- Validate templates.
+- Create scheduled reminder records.
+- Simulate provider responses only in an explicitly labelled development environment.
+- Test cancellation and rescheduling.
+- Test duplicate prevention.
+- Inspect system logs.
+
+Never represent simulated messages as real SMS deliveries.
+
+### Mode 2 — Production Mode
+
+Activated only after a real SMS provider has been verified and configured.
+
+Requirements:
+
+- Valid provider credentials.
+- Server-side API integration.
+- Secure API requests.
+- Real sending responses.
+- Delivery callbacks when supported.
+- Failure handling.
+- Provider message IDs.
+- Actual sending history.
+
+Never expose API keys in frontend code.
+
+Store credentials in server-side environment variables or the existing secure secrets-management solution.
+
+Never hardcode credentials.
+
+Never invent successful SMS responses.
+
+---
+
+# 8. SMS PROVIDER RESEARCH — ALGERIA
+
+The intended market is Algeria.
+
+The SMS system must support sending messages to:
+
+- Ooredoo.
+- Djezzy.
+- Mobilis.
+
+A preliminary Ooredoo offer was identified:
+
+- 2,500 DA.
+- 30 days.
+- Advertised unlimited SMS to Ooredoo, Djezzy, and Mobilis.
+- 120 GB internet.
+- Unlimited national calls.
+
+However, this appears to be a normal mobile subscription.
+
+It has NOT been verified whether it supports:
+
+- Official API access.
+- Automated SMS sending.
+- Business messaging.
+- Web application integration.
+- Scheduled bulk messaging.
+- Third-party gateway integration.
+
+Do not assume this package can be used by the application.
+
+Do not promise unlimited automated SMS for 2,500 DA per month.
+
+### Required provider integration approach
+
+Before choosing a provider:
+
+1. Identify providers or authorized gateways operating in Algeria.
+2. Check whether they provide an official SMS API.
+3. Verify support for Algerian mobile operators.
+4. Check sender ID requirements.
+5. Check delivery report support.
+6. Investigate pricing per SMS.
+7. Investigate minimum balance or monthly commitments.
+8. Verify whether business registration or additional authorization is required.
+9. Check rate limits and permitted sending practices.
+
+Do not fabricate provider names, prices, API documentation, or compatibility.
+
+If provider verification cannot be completed, explain exactly what remains unknown.
+
+For now, build the integration architecture without depending on a particular provider.
+
+---
+
+# 9. SMS HISTORY AND MONITORING
+
+Create a dedicated SMS History module.
+
+Display:
+
+- Recipient name.
+- Phone number.
+- Animal name.
+- SMS category.
+- Message content.
+- Scheduled date and time.
+- Actual sending date and time.
+- Provider message ID.
+- Current status.
+- Failure reason, when available.
+
+Supported statuses:
+
+- Scheduled.
+- Processing.
+- Accepted.
+- Sent.
+- Delivered.
+- Failed.
+- Cancelled.
+
+Important distinction:
+
+Provider acceptance does not necessarily mean successful delivery.
+
+Only display Delivered when the provider confirms delivery.
+
+If delivery confirmation is unavailable, retain the most accurate status the provider actually provides.
+
+### Filters
+
+Allow filtering by:
+
+- Date range.
+- Message status.
+- SMS category.
+- Owner.
+- Animal.
+- Phone number.
+
+### Actions
+
+- View full message.
+- Inspect sending details.
+- Retry failed messages manually.
+- Cancel scheduled messages.
+- View failure reasons.
+
+Manual retries must use the same duplicate-prevention and safety mechanisms as automatic sending.
+
+---
+
+# 10. SMS MESSAGE TEMPLATE MANAGEMENT
+
+Create an SMS Templates module.
+
+Initially support French.
+
+Design the architecture to support Arabic later.
+
+Allow administrators to:
+
+- Create templates.
+- Edit templates.
+- Enable or disable templates.
+- Preview messages.
+- Select a default template for each category.
+
+Supported variables:
+
+- {owner_name}
+- {animal_name}
+- {vaccination_name}
+- {vaccination_date}
+- {appointment_date}
+- {appointment_time}
+- {clinic_name}
+- {clinic_phone}
+
+### Default vaccination template
+
+Bonjour {owner_name}, nous vous rappelons que le prochain vaccin de {animal_name} ({vaccination_name}) est prévu le {vaccination_date}. Pour toute information, contactez le cabinet vétérinaire {clinic_name}.
+
+### Default appointment template
+
+Bonjour {owner_name}, nous vous rappelons le rendez-vous de {animal_name} prévu le {appointment_date} à {appointment_time} au cabinet vétérinaire {clinic_name}.
+
+Ensure that:
+
+- Variables are replaced correctly.
+- Missing variables are handled safely.
+- Messages are concise.
+- SMS encoding is considered.
+- Unicode and French characters are handled correctly.
+- GSM-7 and Unicode SMS segmentation are considered.
+- The user can preview the final message before activation.
+
+Display an estimated segment count when technically possible.
+
+Do not silently truncate messages.
+
+---
+
+# 11. SMS SETTINGS AND SUBSCRIPTION OVERVIEW
+
+Create a dedicated SMS Settings section.
+
+Include:
+
+## Provider configuration
+
+- Selected provider.
+- Connection status.
+- API configuration status.
+- Test connection action, if supported.
+- Production/test mode.
+
+Never reveal full API credentials.
+
+## Reminder settings
+
+- Enable vaccination reminders.
+- Configure vaccination intervals.
+- Enable appointment reminders.
+- Configure appointment intervals.
+- Configure sending hours.
+- Configure clinic timezone.
+
+Timezone must be:
+
+Africa/Algiers.
+
+## Subscription overview
+
+Display:
+
+- Current provider.
+- Package name.
+- Subscription start date.
+- Subscription expiration date.
+- Monthly SMS usage.
+- Total messages sent.
+- Successful messages.
+- Failed messages.
+- Available balance, if the provider exposes it.
+- Actual provider-reported costs, if available.
+
+If the provider does not expose usage or balance information, support authorized manual updates.
+
+Clearly distinguish provider-reported values from manually entered information.
+
+Never display invented remaining balances or fake subscription information.
+
+---
+
+# 12. DASHBOARD OVERVIEW
+
+Integrate relevant statistics into the existing dashboard.
+
+Suggested cards:
+
+- Total Animals.
+- Registered Owners.
+- Upcoming Vaccinations.
+- Overdue Vaccinations.
+- Today's Appointments.
+- Upcoming Appointments.
+- Scheduled SMS.
+- SMS Sent.
+- Failed SMS.
+
+Use real database queries.
+
+Do not use hardcoded demo statistics in production.
+
+Allow dashboard cards to navigate to their corresponding modules.
+
+---
+
+# 13. DATABASE DESIGN
+
+Before implementing database changes, inspect the existing schema.
+
+Then propose and implement only the required additions or modifications.
+
+Potential entities:
+
+1. Owners.
+2. Animals.
+3. Vaccinations.
+4. Appointments.
+5. SMS Templates.
+6. SMS Reminders.
+7. SMS Logs.
+8. SMS Provider Configuration.
+9. SMS Reminder Settings.
+
+Establish correct foreign-key relationships.
+
+### SMS reminder records
+
+Consider fields such as:
+
+- id.
+- owner_id.
+- animal_id.
+- vaccination_id, nullable.
+- appointment_id, nullable.
+- reminder_type.
+- scheduled_at.
+- status.
+- provider_id.
+- provider_message_id.
+- attempts.
+- last_error.
+- sent_at.
+- delivered_at.
+- created_at.
+- updated_at.
+
+### Duplicate prevention
+
+Implement database-level protection.
+
+A reminder must not be sent twice because:
+
+- A scheduler runs more than once.
+- A worker crashes.
+- A retry occurs.
+- A user clicks a button repeatedly.
+- Multiple workers process the same record.
+
+Use unique constraints, idempotency keys, transactional updates, or other appropriate mechanisms based on the actual database.
+
+A worker must atomically claim a reminder before sending it.
+
+Do not rely exclusively on frontend checks.
+
+---
+
+# 14. RELIABILITY AND ERROR HANDLING
+
+Implement:
+
+- Africa/Algiers timezone handling.
+- Reliable backend scheduling.
+- Duplicate prevention.
+- Retry policies.
+- Exponential backoff where appropriate.
+- Provider timeout handling.
+- Error logging.
+- Webhook signature verification.
+- Webhook idempotency.
+- Cancellation of outdated reminders.
+- Safe handling of invalid phone numbers.
+- SMS consent verification.
+- Protection against sending outside permitted hours.
+- Database transaction safety.
+
+Do not retry permanent failures indefinitely.
+
+Do not retry a message blindly if the provider's response is ambiguous and the original message may already have been accepted.
+
+Use provider idempotency support where available.
+
+If unavailable, explain the remaining risk and implement a safe reconciliation strategy.
+
+---
+
+# 15. SECURITY AND PRIVACY
+
+This application handles customer information and veterinary records.
+
+Implement appropriate security measures:
+
+- Existing authentication must remain intact.
+- Role-based access where supported.
+- Server-side authorization.
+- Server-side validation.
+- Secure API credentials.
+- Protection against unauthorized access.
+- Secure webhook endpoints.
+- Audit logs.
+- Database backups.
+- Input sanitization.
+- Rate limiting for sensitive endpoints.
+- Protection against accidental repeated sending.
+
+Store only the personal information necessary for the clinic's operations.
+
+SMS messages should avoid unnecessary medical details.
+
+Support customer consent and opt-out management.
+
+Review applicable Algerian legal and regulatory requirements before production deployment.
+
+Do not claim legal compliance without verification.
+
+---
+
+# 16. USER INTERFACE AND USER EXPERIENCE
+
+The entire new system must follow the existing MyVet design.
+
+Add or adapt navigation entries:
+
+1. Dashboard.
+2. Dossier Médical & Animaux.
+3. Agenda & Planning.
+4. Relations Clients & Rappels.
+5. Facturation & Devis.
+6. Clôture de caisse.
+7. Suivi Hospitalisation.
+8. Tâches d'équipe.
+9. Gestion des Stocks.
+10. Rapports & Statistiques.
+11. SMS & Notifications.
+
+The SMS section may contain internal tabs:
+
+- Vue d'ensemble.
+- Rappels.
+- Historique SMS.
+- Modèles.
+- Paramètres.
+
+Build fully functional interfaces for:
+
+- Adding and editing owners.
+- Adding and editing animals.
+- Registering vaccinations.
+- Managing appointments.
+- Configuring reminders.
+- Previewing SMS messages.
+- Viewing SMS history.
+- Filtering and searching.
+- Retrying failed messages.
+
+Every visible action must work.
+
+Do not create decorative buttons that do nothing.
+
+Include:
+
+- Loading states.
+- Empty states.
+- Success feedback.
+- Error feedback.
+- Confirmation dialogs for destructive actions.
+- Responsive layouts.
+- Accessible form controls.
+
+All primary interface text should be in French.
+
+---
+
+# 17. IMPLEMENTATION STRATEGY — WORK IN PHASES
+
+Do not attempt a risky, uncontrolled rewrite of the entire application.
+
+Follow these phases.
+
+## PHASE 1 — AUDIT AND ARCHITECTURE
+
+Inspect the codebase.
+
+Deliver:
+
+- Current architecture summary.
+- Existing database summary.
+- Existing dashboard structure.
+- Technical limitations.
+- Required schema changes.
+- Proposed backend architecture.
+- Implementation plan.
+
+Do not modify files yet.
+
+Wait for approval before implementing substantial architectural changes.
+
+## PHASE 2 — DATA MANAGEMENT
+
+Implement or extend:
+
+- Owners.
+- Animals.
+- Vaccinations.
+- Appointments.
+
+Ensure proper database relationships and validation.
+
+Test all CRUD operations.
+
+## PHASE 3 — REMINDER ENGINE
+
+Implement:
+
+- Scheduled reminder creation.
+- Background processing.
+- Configurable reminder intervals.
+- Appointment reminder scheduling.
+- Automatic cancellation.
+- Automatic rescheduling.
+- Duplicate prevention.
+- Timezone handling.
+
+Test the complete workflow without real SMS sending.
+
+## PHASE 4 — SMS PROVIDER ABSTRACTION
+
+Implement:
+
+- Provider interface.
+- Provider adapter structure.
+- Test provider.
+- Environment configuration.
+- Sending service.
+- Delivery webhook architecture.
+- Retry and failure handling.
+
+Keep real production sending disabled until provider credentials and compatibility are verified.
+
+## PHASE 5 — SMS DASHBOARD
+
+Implement:
+
+- SMS overview.
+- SMS History.
+- Templates.
+- Settings.
+- Subscription overview.
+- Filtering.
+- Manual retry.
+- Usage statistics.
+
+## PHASE 6 — INTEGRATION AND TESTING
+
+Test:
+
+1. Creating an owner.
+2. Registering multiple animals for one owner.
+3. Registering vaccinations.
+4. Generating vaccination reminders.
+5. Generating appointment reminders.
+6. Cancelling appointments.
+7. Rescheduling appointments.
+8. Changing vaccination dates.
+9. Preventing duplicate SMS.
+10. Retrying failed messages.
+11. Updating delivery statuses.
+12. Handling invalid phone numbers.
+13. Handling provider outages.
+14. Verifying permissions.
+15. Testing mobile responsiveness.
+
+Run existing project tests.
+
+Add tests for all critical new workflows.
+
+Fix regressions introduced by your changes.
+
+---
+
+# 18. DEVELOPMENT RULES
+
+Follow these rules throughout implementation:
+
+- Write clean, maintainable, modular code.
+- Use the existing project conventions.
+- Avoid unnecessary abstractions.
+- Avoid unnecessary dependencies.
+- Keep business logic separate from UI components.
+- Keep provider integration separate from reminder scheduling.
+- Use strong validation.
+- Handle errors explicitly.
+- Avoid hardcoded production data.
+- Never expose secrets.
+- Never fake real SMS delivery.
+- Never silently remove existing functionality.
+- Never make unrelated visual changes.
+
+Before modifying a critical file, understand its dependencies.
+
+Preserve backward compatibility wherever possible.
+
+If a migration is required, provide a safe migration and rollback strategy appropriate to the existing database.
+
+---
+
+# 19. REQUIRED DELIVERABLES
+
+At the end of the implementation, provide:
+
+1. Summary of the existing architecture.
+2. Summary of changes made.
+3. Database schema changes.
+4. List of newly created files.
+5. List of modified files.
+6. Backend scheduling explanation.
+7. SMS provider integration explanation.
+8. Required environment variables.
+9. Database migration instructions.
+10. Testing results.
+11. Known limitations.
+12. Steps required to activate real SMS sending.
+13. Deployment instructions.
+
+Clearly separate:
+
+**Already functional:**
+Features that genuinely work with the current implementation.
+
+**Requires configuration:**
+Features that need environment variables, credentials, or deployment setup.
+
+**Requires an external provider:**
+Features that cannot operate until an authorized SMS provider is integrated.
+
+---
+
+# 20. FINAL EXECUTION INSTRUCTIONS
+
+Start with PHASE 1 only.
+
+Inspect the complete existing MyVet codebase.
+
+Do not start coding immediately.
+
+First explain:
+
+- What already exists.
+- What can be reused.
+- What is missing.
+- What needs modification.
+- Which architecture you recommend.
+- Whether the current hosting environment supports reliable background scheduling.
+
+Pay particular attention to the difference between frontend functionality and actual backend functionality.
+
+After presenting the audit and implementation plan, wait for my approval before starting the major implementation.
+
+Once approved, implement the system phase by phase, verifying each phase before continuing.
+
+**FINAL QUALITY STANDARD:**
+
+The result must be a genuine, functional veterinary clinic management system, not merely a visually attractive prototype.
+
+The SMS functionality must be designed for real-world use in Algeria, with secure provider integration, reliable automated scheduling, accurate delivery statuses, and no fabricated provider capabilities.
+
+Preserve the existing MyVet project and improve it intelligently rather than rebuilding it unnecessarily.

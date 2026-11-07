@@ -1,0 +1,6 @@
+{
+  "name": "My Vet",
+  "description": "Cabinet Vétérinaire My Vet — Le bien-être de vos compagnons, notre priorité. Système de gestion de cabinet, agenda, dossiers médicaux et ordonnances.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

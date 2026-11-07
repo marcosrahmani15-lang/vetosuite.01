@@ -1,0 +1,120 @@
+/**
+ * GSM-7 and Unicode / UCS-2 SMS Segmentation & Encoding Analyzer
+ * Implements telecommunication standard 3GPP TS 23.038 / GSM 03.38.
+ */
+
+// Standard GSM-7 Basic Character Set (128 characters)
+export const GSM7_BASIC_CHARACTERS =
+  "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞ\x1BÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà";
+
+// GSM-7 Extension Table (each takes 2 septets / 2 character space in GSM-7 via escape 0x1B)
+export const GSM7_EXTENDED_CHARACTERS = "^{}\\[~]|€";
+
+export interface SMSSegmentationResult {
+  encoding: 'GSM-7' | 'UCS-2 (Unicode)';
+  characterCount: number;
+  encodedLength: number; // Accounting for extension escape characters
+  segmentCount: number;
+  remainingInCurrentSegment: number;
+  maxPerSegment: number;
+  isConcatenated: boolean;
+  containsUnicode: boolean;
+  nonGsmCharacters: string[];
+  // Parity aliases
+  segments: number;
+  charCount: number;
+  remainingInSegment: number;
+}
+
+export function analyzeSMSContent(text: string): SMSSegmentationResult {
+  if (!text) {
+    return {
+      encoding: 'GSM-7',
+      characterCount: 0,
+      encodedLength: 0,
+      segmentCount: 0,
+      remainingInCurrentSegment: 160,
+      maxPerSegment: 160,
+      isConcatenated: false,
+      containsUnicode: false,
+      nonGsmCharacters: [],
+      segments: 0,
+      charCount: 0,
+      remainingInSegment: 160
+    };
+  }
+
+  let isGSM7 = true;
+  let gsm7Length = 0;
+  const nonGsmChars: string[] = [];
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charAt(i);
+    if (GSM7_BASIC_CHARACTERS.includes(char)) {
+      gsm7Length += 1;
+    } else if (GSM7_EXTENDED_CHARACTERS.includes(char)) {
+      gsm7Length += 2; // Escape sequence (0x1B) + character
+    } else {
+      isGSM7 = false;
+      if (!nonGsmChars.includes(char)) {
+        nonGsmChars.push(char);
+      }
+    }
+  }
+
+  const charCount = text.length;
+
+  if (isGSM7) {
+    // GSM-7: 160 characters for single segment, 153 for concatenated
+    let segmentCount = 1;
+    let remaining = 160 - gsm7Length;
+
+    if (gsm7Length > 160) {
+      segmentCount = Math.ceil(gsm7Length / 153);
+      remaining = segmentCount * 153 - gsm7Length;
+    }
+
+    return {
+      encoding: 'GSM-7',
+      characterCount: charCount,
+      encodedLength: gsm7Length,
+      segmentCount,
+      remainingInCurrentSegment: Math.max(0, remaining),
+      maxPerSegment: segmentCount > 1 ? 153 : 160,
+      isConcatenated: segmentCount > 1,
+      containsUnicode: false,
+      nonGsmCharacters: [],
+      segments: segmentCount,
+      charCount,
+      remainingInSegment: Math.max(0, remaining)
+    };
+  }
+
+  // UCS-2 (Unicode): 70 characters for single segment, 67 for concatenated
+  let segmentCount = 1;
+  let remaining = 70 - charCount;
+
+  if (charCount > 70) {
+    segmentCount = Math.ceil(charCount / 67);
+    remaining = segmentCount * 67 - charCount;
+  }
+
+  return {
+    encoding: 'UCS-2 (Unicode)',
+    characterCount: charCount,
+    encodedLength: charCount,
+    segmentCount,
+    remainingInCurrentSegment: Math.max(0, remaining),
+    maxPerSegment: segmentCount > 1 ? 67 : 70,
+    isConcatenated: segmentCount > 1,
+    containsUnicode: true,
+    nonGsmCharacters: nonGsmChars.slice(0, 10),
+    segments: segmentCount,
+    charCount,
+    remainingInSegment: Math.max(0, remaining)
+  };
+}
+
+export function calculateSmsSegments(text: string): SMSSegmentationResult {
+  return analyzeSMSContent(text);
+}

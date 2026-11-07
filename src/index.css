@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --brand-primary: #3A683D;
+  --brand-dark: #1B2F1C;
+  --brand-secondary: #5A7E32;
+
+  --brand-sage: #859766;
+  --brand-sage-soft: #A3A87F;
+  --brand-sage-pale: #E7ECD9;
+
+  --background-main: #F8F8F1;
+  --background-white: #FFFFFF;
+
+  --text-primary: #1B2F1C;
+  --text-secondary: #52604C;
+
+  --border-color: #C7D2BA;
+  --button-hover: #2F5933;
+
+  --shadow-soft: rgba(27, 47, 28, 0.08);
+  --overlay-dark: rgba(27, 47, 28, 0.35);
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F8F8F1;
+    color: #1B2F1C;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.font-brand-script {
+  font-family: 'Caveat', cursive, sans-serif;
+}
+
+/* Custom scrollbar matching My Vet botanical theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #C7D2BA;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #859766;
+}
+
+/* Printable prescription pad styles */
+@media print {
+  body {
+    background-color: #ffffff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
